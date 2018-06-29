@@ -31,6 +31,7 @@ import android.location.LocationProvider;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -48,7 +49,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
     final static String USER_AGENT = "Mozilla/5.0";
     final static String[] INIT_PERMS = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -77,7 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         longitud = (EditText) findViewById(R.id.longitud);
         find.setOnClickListener(this);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -130,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (canAccessInternet() && canAccessCoarseLocation() && canAccesLocation()) {
             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if(location==null){
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,10,locationListener);
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 
             }
@@ -166,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("LISTENER","es nulo :(");
             }
             if(canAccesLocation()) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, locationListener);
             }
 
 
@@ -203,12 +204,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap mMap) {
+    public void onMapReady(GoogleMap mMap){
         _mMap = mMap;
-        LatLng place = new LatLng(13.983145, -89.561878);
+        _mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        LatLng place = new LatLng(12.556677, -89.561878);
 
         _mMap.addMarker(new MarkerOptions().position(place).title("funciona wey"));
-        _mMap.moveCamera(CameraUpdateFactory.newLatLng(place));
+        _mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place,17f));
     }
 
 
@@ -220,8 +222,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double lngValue = Double.parseDouble(longitud.getText().toString());
             LatLng place = new LatLng(latValue, lngValue);
 
-            _mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            _mMap.moveCamera(CameraUpdateFactory.newLatLng(place));
+            _mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//            _mMap.moveCamera(CameraUpdateFactory.newLatLng(place));
+            _mMap.addMarker(new MarkerOptions().position(place).title("Santa Ana"));
+            _mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place,17f));
+
+
+
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error " + e.getMessage(), Toast.LENGTH_LONG).show();
 
@@ -305,7 +312,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                       }
                       JSONObject respuestaJson = new JSONObject(result.toString());
                       JSONArray resultJson = respuestaJson.getJSONArray("results");
-                      direccion = "Sin datos para esa direccion";
+                      direccion = "";
                       if (resultJson.length() > 0) {
                           direccion = resultJson.getJSONObject(0).getString("formatted_address");
 
