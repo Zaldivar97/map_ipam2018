@@ -33,7 +33,8 @@
                 android:layout_weight="1"
                 android:ems="8"
                 android:hint="Latitud"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:text="13.983145" />
 
             <EditText
                 android:id="@+id/longitud"
@@ -42,7 +43,8 @@
                 android:layout_weight="1"
                 android:ems="8"
                 android:hint="Longitud"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:text="-89.561878" />
 
             <Button
                 android:id="@+id/find"
